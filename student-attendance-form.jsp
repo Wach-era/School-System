@@ -15,6 +15,8 @@
     <meta charset="UTF-8">
     <title>Record Attendance</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/bootstrap.min.css">
+        <%@ include file="/WEB-INF/includes/header.jsp" %>
+    
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -80,30 +82,36 @@
             border-color: #545b62;
         }
         .table-container {
-    margin-top: 30px;
-}
-
-.table {
-    width: 100%;
-    margin-bottom: 20px;
-}
-
-.table thead th {
-    background-color: #f8f9fa;
-    border-bottom: 2px solid #dee2e6;
-    text-align: center; /* Center the header text */
-}
-
-.table tbody td {
-    text-align: center; /* Center the body text */
-    vertical-align: middle; /* Vertically center the body text */
-}
-
-.table tbody .btn {
-    display: inline-block; /* Ensure buttons are inline */
-    margin: 0 5px; /* Optional: Add some spacing between buttons */
-}
-
+            margin-top: 30px;
+        }
+        .table {
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        .table thead th {
+            background-color: #f8f9fa;
+            border-bottom: 2px solid #dee2e6;
+            text-align: center;
+        }
+        .table tbody td {
+            text-align: center;
+            vertical-align: middle;
+        }
+        .table tbody .btn {
+            display: inline-block;
+            margin: 0 5px;
+        }
+        /* Added for chart */
+        .chart-container {
+            margin: 25px 0;
+            height: 300px;
+        }
+        .chart-filter {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
     </style>
 </head>
 <body>
@@ -126,10 +134,31 @@
         </select>
     </div>
     <button type="submit" class="btn btn-primary">${attendance != null ? 'Update Attendance' : 'Record Attendance'}</button>
-</form><br>
+    </form><br>
 
-                <a href="${pageContext.request.contextPath}/students/list" class="btn btn-primary">Go Back</a>
+    <div class="chart-filter">
+        <h4>Attendance Chart</h4>
+        <form id="chartFilter" class="row">
+            <div class="col-md-5">
+                <label class="form-label">From Date</label>
+                <input type="date" name="startDate" class="form-control">
+            </div>
+            <div class="col-md-5">
+                <label class="form-label">To Date</label>
+                <input type="date" name="endDate" class="form-control">
+            </div>
+            <div class="col-md-2" style="display: flex; align-items: flex-end;">
+                <button type="submit" class="btn btn-primary">Update</button>
+            </div>
+            <input type="hidden" name="studentId" value="${param.studentId}">
+        </form>
+    </div>
+    
+    <div class="chart-container">
+        <canvas id="attendanceChart"></canvas>
+    </div>
 
+    <a href="${pageContext.request.contextPath}/students/list" class="btn btn-primary">Go Back</a>
 
     <div class="table-container">
         <h2>Previous Attendance Records</h2>
@@ -156,5 +185,72 @@
         </table>
     </div>
 </div>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const ctx = document.getElementById('attendanceChart').getContext('2d');
+    let attendanceChart;
+    
+    function loadChart(params = '') {
+        fetch('${pageContext.request.contextPath}/student-attendance/data?' + params)
+            .then(response => response.json())
+            .then(data => {
+                if (attendanceChart) {
+                    attendanceChart.destroy();
+                }
+                
+                attendanceChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: data.labels,
+                        datasets: [
+                            {
+                                label: 'Present',
+                                data: data.present,
+                                backgroundColor: '#28a745'
+                            },
+                            {
+                                label: 'Absent',
+                                data: data.absent,
+                                backgroundColor: '#dc3545'
+                            },
+                            {
+                                label: 'Late',
+                                data: data.late,
+                                backgroundColor: '#ffc107'
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    stepSize: 1
+                                }
+                            }
+                        }
+                    }
+                });
+            });
+    }
+    
+    // Initial load with current studentId
+    loadChart('studentId=${param.studentId}');
+    
+    // Filter form handler
+    document.getElementById('chartFilter').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const params = new URLSearchParams(new FormData(this));
+        loadChart(params);
+    });
+});
+</script>
 </body>
 </html>

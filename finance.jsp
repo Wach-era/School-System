@@ -14,6 +14,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Finance Management System Menu</title>
+        <%@ include file="/WEB-INF/includes/header.jsp" %>
+    
     <style>
         body {
             font-family: Arial, sans-serif;

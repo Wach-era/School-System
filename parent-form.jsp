@@ -13,6 +13,8 @@
 <head>
     <title>${parent == null ? 'Add Parent' : 'Edit Parent'}</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+            <%@ include file="/WEB-INF/includes/header.jsp" %>
+    
 </head>
 <body>
 <div class="container">

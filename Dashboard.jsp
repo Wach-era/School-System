@@ -28,6 +28,8 @@
 <html>
 <head>
     <title>Dashboard</title>
+        <%@ include file="/WEB-INF/includes/header.jsp" %>
+    
     <style>
         body {
             font-family: Arial, sans-serif;

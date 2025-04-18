@@ -11,6 +11,10 @@
 <head>
     <title>Student List</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    
+        <%@ include file="/WEB-INF/includes/header.jsp" %>
+    
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -223,13 +227,10 @@
 </div>
     </c:forEach>
 </div>
-<!-- Include jQuery first -->
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 
-<!-- Include Bootstrap JS (if needed) -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
 
-<!-- Your custom script -->
 <script>
     $(document).ready(function() {
         $(".btn-library").click(function() {

@@ -6,6 +6,8 @@
 <head>
     <title>Students in Subject</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/bootstrap.min.css">
+            <%@ include file="/WEB-INF/includes/header.jsp" %>
+    
     <style>
         body {
             font-family: Arial, sans-serif;
