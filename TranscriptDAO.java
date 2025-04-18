@@ -138,4 +138,48 @@ public class TranscriptDAO {
             }
         }
     }
+    
+    public List<ExamResult> getResultsByTrimester(String trimesterId) throws SQLException {
+        String query = "SELECT er.*, e.subject_name, e.max_score, e.exam_date, " +
+                      "s.first_name, s.middle_name, s.last_name " +
+                      "FROM ExamResults er " +
+                      "JOIN Exams e ON er.exam_id = e.exam_id " +
+                      "JOIN Students s ON er.student_id = s.student_id " +
+                      "JOIN Trimesters t ON e.exam_date BETWEEN t.start_date AND t.end_date " +
+                      "WHERE t.trimester_id = ? " +
+                      "ORDER BY e.subject_name, er.student_id";
+
+        List<ExamResult> results = new ArrayList<>();
+        
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setString(1, trimesterId);
+            ResultSet rs = statement.executeQuery();
+            
+            while (rs.next()) {
+                ExamResult result = new ExamResult();
+                // Core result data
+                result.setResultId(rs.getInt("result_id"));
+                result.setExamId(rs.getString("exam_id"));
+                result.setStudentId(rs.getInt("student_id"));
+                result.setScore(rs.getDouble("score"));
+                
+                // Exam-related data
+                result.setSubjectName(rs.getString("subject_name"));
+                result.setMaxScore(rs.getDouble("max_score"));
+                result.setExamDate(rs.getDate("exam_date"));
+                
+                // Student info
+                result.setFirstName(rs.getString("first_name"));
+                result.setMiddleName(rs.getString("middle_name"));
+                result.setLastName(rs.getString("last_name"));
+                
+                results.add(result);
+            }
+        } catch (SQLException e) {
+            printSQLException(e);
+            throw e;
+        }
+        
+        return results;
+    }
 }
