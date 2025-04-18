@@ -166,7 +166,6 @@ public class StudentFeePaymentDAO {
     }
     
     public void updateTotalFeesDue(int studentId, double amountPaid) throws SQLException {
-        // Adjust the total fees due by adding the deleted payment amount back to the total
         String sql = "UPDATE StudentFeePayment SET amount_due = amount_due + ? WHERE student_id = ?";
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {

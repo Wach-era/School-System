@@ -5,10 +5,14 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.sql.Date;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Map;
 
 @WebServlet("/student-attendance/*")
 public class StudentAttendanceServlet extends HttpServlet {
@@ -35,9 +39,12 @@ public class StudentAttendanceServlet extends HttpServlet {
                 case "/delete":
                     deleteAttendance(request, response);
                     break;
+                case "/data":  
+                    getAttendanceData(request, response);
+                    break;
                 case "/list":
                 default:
-                    response.sendRedirect(request.getContextPath() + "/"); // Redirect to home or appropriate page
+                    response.sendRedirect(request.getContextPath() + "/");
                     break;
             }
         } catch (SQLException e) {
@@ -113,5 +120,59 @@ public class StudentAttendanceServlet extends HttpServlet {
 
         attendanceDAO.deleteStudentAttendance(attendanceId);
         response.sendRedirect(request.getContextPath() + "/student-attendance/new?studentId=" + studentId);
+    }
+    
+    private void getAttendanceData(HttpServletRequest request, HttpServletResponse response) 
+            throws IOException, SQLException {
+        int studentId = Integer.parseInt(request.getParameter("studentId"));
+        String startDate = request.getParameter("startDate");
+        String endDate = request.getParameter("endDate");
+
+        Map<Date, Map<String, Integer>> dailyData = attendanceDAO.getDailyAttendance(
+            studentId, 
+            startDate, 
+            endDate
+        );
+
+        response.setContentType("application/json");
+        PrintWriter out = response.getWriter();
+        
+        out.print("{");
+        out.print("\"labels\":[");
+        boolean first = true;
+        for (Date date : dailyData.keySet()) {
+            if (!first) out.print(",");
+            out.print("\"" + new SimpleDateFormat("MMM dd").format(date) + "\"");
+            first = false;
+        }
+        out.print("],");
+        
+        out.print("\"present\":[");
+        first = true;
+        for (Map<String, Integer> statusMap : dailyData.values()) {
+            if (!first) out.print(",");
+            out.print(statusMap.getOrDefault("Present", 0));
+            first = false;
+        }
+        out.print("],");
+        
+        out.print("\"absent\":[");
+        first = true;
+        for (Map<String, Integer> statusMap : dailyData.values()) {
+            if (!first) out.print(",");
+            out.print(statusMap.getOrDefault("Absent", 0));
+            first = false;
+        }
+        out.print("],");
+        
+        out.print("\"late\":[");
+        first = true;
+        for (Map<String, Integer> statusMap : dailyData.values()) {
+            if (!first) out.print(",");
+            out.print(statusMap.getOrDefault("Late", 0));
+            first = false;
+        }
+        out.print("]");
+        out.print("}");
     }
 }

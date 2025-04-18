@@ -9,7 +9,10 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @WebServlet("/reportservlet/*")
 public class ReportServlet extends HttpServlet {
@@ -28,7 +31,7 @@ public class ReportServlet extends HttpServlet {
         String action = request.getPathInfo();
 
         if (action == null) {
-            action = "/generate"; // Default action
+            action = "/generate"; 
         }
 
         try {
@@ -137,6 +140,22 @@ public class ReportServlet extends HttpServlet {
                         break;
                 }
             }
+        }
+        
+        if (categories != null) {
+            Map<String, Object> summaryStats = new HashMap<>();
+            
+            if (Arrays.asList(categories).contains("attendance")) {
+                long presentDays = attendanceList.stream().filter(a -> a.getStatus().equals("Present")).count();
+                summaryStats.put("attendanceRate", (presentDays * 100) / attendanceList.size());
+            }
+            
+            if (Arrays.asList(categories).contains("finance")) {
+                double totalPaid = feePayments.stream().mapToDouble(StudentFeePayment::getAmountPaid).sum();
+                summaryStats.put("totalPaid", totalPaid);
+            }
+            
+            request.setAttribute("summaryStats", summaryStats);
         }
 
         request.setAttribute("student", student);

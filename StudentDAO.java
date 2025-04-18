@@ -15,7 +15,7 @@ public class StudentDAO {
     private String jdbcUsername = "root";
     private String jdbcPassword = "Bhillary@2021";
 
-    private static final String INSERT_STUDENT_SQL = "INSERT INTO Students (student_id, first_name, middle_name, last_name, date_of_birth, email, phone_number, gender, religion, medical_history, emergency_contact, learning_disabilities, date_of_enrollment, disability_details) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    private static final String INSERT_STUDENT_SQL = "INSERT INTO Students (student_id, first_name, middle_name, last_name, date_of_birth, email, phone_number, gender, religion, medical_history, emergency_contact, learning_disabilities, date_of_enrollment, disability_details) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     private static final String SELECT_STUDENT_BY_ID = "SELECT * FROM Students WHERE student_id = ?";
     private static final String SELECT_ALL_STUDENTS = "SELECT * FROM Students";
     private static final String DELETE_STUDENT_SQL = "DELETE FROM Students WHERE student_id = ?";
@@ -50,11 +50,11 @@ public class StudentDAO {
             preparedStatement.setString(7, student.getPhoneNumber());
             preparedStatement.setString(8, student.getGender());
             preparedStatement.setString(9, student.getReligion());
-            preparedStatement.setString(12, student.getMedicalHistory());
-            preparedStatement.setString(13, student.getEmergencyContact());
-            preparedStatement.setString(14, student.getLearningDisabilities());
-            preparedStatement.setDate(15, student.getDateOfEnrollment() != null ? Date.valueOf(student.getDateOfEnrollment()) : null);
-            preparedStatement.setString(16, student.getDisabilityDetails());
+            preparedStatement.setString(10, student.getMedicalHistory());
+            preparedStatement.setString(11, student.getEmergencyContact());
+            preparedStatement.setString(12, student.getLearningDisabilities());
+            preparedStatement.setDate(13, student.getDateOfEnrollment() != null ? Date.valueOf(student.getDateOfEnrollment()) : null);
+            preparedStatement.setString(14, student.getDisabilityDetails());
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
             printSQLException(e);
@@ -139,12 +139,13 @@ public class StudentDAO {
             statement.setString(6, student.getPhoneNumber());
             statement.setString(7, student.getGender());
             statement.setString(8, student.getReligion());
-            statement.setString(11, student.getMedicalHistory());
-            statement.setString(12, student.getEmergencyContact());
-            statement.setString(13, student.getLearningDisabilities());
-            statement.setDate(14, student.getDateOfEnrollment() != null ? Date.valueOf(student.getDateOfEnrollment()) : null);
-            statement.setString(15, student.getDisabilityDetails());
-            statement.setInt(16, student.getStudentId());
+            statement.setString(9, student.getMedicalHistory());  
+            statement.setString(10, student.getEmergencyContact()); 
+            statement.setString(11, student.getLearningDisabilities()); 
+            statement.setDate(12, student.getDateOfEnrollment() != null ? Date.valueOf(student.getDateOfEnrollment()) : null); 
+            statement.setString(13, student.getDisabilityDetails()); 
+            statement.setInt(14, student.getStudentId()); 
+            
             rowUpdated = statement.executeUpdate() > 0;
         }
         return rowUpdated;

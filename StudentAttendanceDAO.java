@@ -6,8 +6,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.sql.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 public class StudentAttendanceDAO {
     private Connection connection;
@@ -127,5 +130,35 @@ public class StudentAttendanceDAO {
             e.printStackTrace();
         }
         return attendanceList;
+    }
+    
+    public Map<Date, Map<String, Integer>> getDailyAttendance(int studentId, String startDate, String endDate) 
+            throws SQLException {
+        String sql = "SELECT date, status, COUNT(*) as count " +
+                    "FROM StudentAttendance " +
+                    "WHERE student_id = ? " +
+                    (startDate != null ? "AND date >= ? " : "") +
+                    (endDate != null ? "AND date <= ? " : "") +
+                    "GROUP BY date, status";
+        
+        Map<Date, Map<String, Integer>> dailyData = new java.util.TreeMap<>();
+        
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            int paramIndex = 1;
+            stmt.setInt(paramIndex++, studentId);
+            if (startDate != null) stmt.setString(paramIndex++, startDate);
+            if (endDate != null) stmt.setString(paramIndex++, endDate);
+            
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                Date date = rs.getDate("date");
+                String status = rs.getString("status");
+                int count = rs.getInt("count");
+                
+                dailyData.computeIfAbsent(date, k -> new HashMap<>())
+                         .put(status, count);
+            }
+        }
+        return dailyData;
     }
 }
